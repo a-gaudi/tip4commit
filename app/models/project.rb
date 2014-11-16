@@ -1,4 +1,6 @@
 class Project < ActiveRecord::Base
+  acts_as_paranoid
+  
   has_many :deposits # todo: only confirmed deposits
   has_many :tips, inverse_of: :project
   accepts_nested_attributes_for :tips
@@ -20,13 +22,15 @@ class Project < ActiveRecord::Base
   # before_save :check_tips_to_pay_against_avaiable_amount
 
   def update_repository_info repo
-    self.github_id = repo.id
-    self.name = repo.name
-    self.full_name = repo.full_name
+    self.github_id        = repo.id
+    self.name             = repo.name
+    self.full_name        = repo.full_name
     self.source_full_name = repo.source.full_name rescue ''
-    self.description = repo.description
-    self.watchers_count = repo.watchers_count
-    self.language = repo.language
+    self.description      = repo.description
+    self.watchers_count   = repo.watchers_count
+    self.language         = repo.language
+    self.avatar_url       = repo.organization.rels[:avatar].href if repo.organization.present?
+
     self.save!
   end
 
@@ -117,7 +121,9 @@ class Project < ActiveRecord::Base
   def tip_for commit
     if (next_tip_amount > 0) && !Tip.exists?(commit: commit.sha)
 
-      user = User.find_or_create_with_commit commit
+      user = User.find_by_commit(commit)
+      return unless user
+
       user.update(nickname: commit.author.login) if commit.author.try(:login)
 
       if hold_tips
@@ -132,7 +138,7 @@ class Project < ActiveRecord::Base
                           commit: commit.sha,
                           commit_message: commit.commit.message })
 
-      tip.notify_user
+      # tip.notify_user
 
       Rails.logger.info "    Tip created #{tip.inspect}"
     end
@@ -159,7 +165,9 @@ class Project < ActiveRecord::Base
   end
 
   def next_tip_amount
-    (CONFIG["tip"]*available_amount).ceil
+    next_tip_amount = (CONFIG["tip"]*available_amount).ceil
+    next_tip_amount = [next_tip_amount, CONFIG["min_tip"]].max if CONFIG["min_tip"]
+    next_tip_amount = [next_tip_amount, available_amount].min
   end
 
   def update_cache
@@ -203,13 +211,45 @@ class Project < ActiveRecord::Base
   end
 
   def self.find_or_create_by_url project_url
-
     project_name = project_url.
       gsub(/https?\:\/\/github.com\//, '').
       gsub(/\#.+$/, '').
       gsub(' ', '')
 
     Github.new.find_or_create_project project_name
+  end
 
+  def self.find_by_url project_url
+    project_name = project_url.
+      gsub(/https?\:\/\/github.com\//, '').
+      gsub(/\#.+$/, '').
+      gsub(' ', '')
+
+    Github.new.find_project project_name
+  end
+
+  # Removes inactive addresses from the wallet
+  # Description: https://blockchain.info/api/blockchain_wallet_api
+  def self.consolidate_addresses
+    uri = URI("https://blockchain.info/merchant/#{CONFIG["blockchain_info"]["guid"]}/auto_consolidate?password=#{CONFIG["blockchain_info"]["password"]}&days=60")
+    return Net::HTTP.get_response(uri)
+  end
+
+  def archive_address!
+    if self.bitcoin_address.present?
+      uri = URI("https://blockchain.info/merchant/#{CONFIG["blockchain_info"]["guid"]}/archive_address?password=#{CONFIG["blockchain_info"]["password"]}&address=#{self.bitcoin_address}")
+      return Net::HTTP.get_response(uri)
+    else
+      return nil
+    end
+  end
+
+  def unarchive_address!
+    if self.bitcoin_address.present?
+      uri = URI("https://blockchain.info/merchant/#{CONFIG["blockchain_info"]["guid"]}/unarchive_address?password=#{CONFIG["blockchain_info"]["password"]}&address=#{self.bitcoin_address}")
+      return Net::HTTP.get_response(uri)
+    else
+      return nil
+    end
   end
 end

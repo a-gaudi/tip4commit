@@ -23,12 +23,13 @@ gem 'octokit',         '~> 2.7.0'
 gem 'sawyer',          '~> 0.5.2'
 gem 'twitter_bootstrap_form_for', github: 'stouset/twitter_bootstrap_form_for'
 gem 'twitter-bootstrap-rails',    github: 'seyhunak/twitter-bootstrap-rails', branch: 'bootstrap3'
-gem 'bootstrap_form', github: 'sigmike/rails-bootstrap-forms', branch: 'removed_for_on_radio_label'
+gem 'bootstrap_form', github: 'bootstrap-ruby/rails-bootstrap-forms'
 gem 'sdoc', group: :doc, require: false
 gem 'cancancan'
 gem 'dusen'
 gem 'render_csv'
 gem 'demoji'
+gem 'acts_as_paranoid', github: 'ActsAsParanoid/acts_as_paranoid'
 
 gem "http_accept_language"
 gem 'rails-i18n'
@@ -41,13 +42,13 @@ group :development do
   gem 'capistrano-rvm',     '~> 0.1.0', github: 'capistrano/rvm'
   gem 'capistrano-bundler', '>= 1.1.0'
   gem 'capistrano-rails',   '~> 1.1.0'
-  gem 'sqlite3',            '~> 1.3.8'
+  gem 'debugger',           '~> 1.6.5'
 end
 
 group :development, :test do
+  gem 'sqlite3',            '~> 1.3.8'
   gem 'factory_girl_rails', '~> 4.3.0'
   gem 'rspec-rails',        '~> 3.0.0.beta'
-  gem 'debugger',           '~> 1.6.5'
 end
 
 group :test do

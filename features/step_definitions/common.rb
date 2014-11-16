@@ -21,12 +21,25 @@ Given(/^our fee is "(.*?)"$/) do |arg1|
   CONFIG["our_fee"] = arg1.to_f
 end
 
+Given(/^min tip amount is "(.*?)"$/) do |arg1|
+  CONFIG["min_tip"] = arg1.to_f * 1e8
+end
+
 Given(/^a project$/) do
   @project = Project.create!(full_name: "example/test", github_id: 123, bitcoin_address: 'mq4NtnmQoQoPfNWEPbhSvxvncgtGo6L8WY')
 end
 
 Given(/^a project "(.*?)"$/) do |arg1|
   @project = Project.create!(full_name: "example/#{arg1}", github_id: Digest::SHA1.hexdigest(arg1), bitcoin_address: 'mq4NtnmQoQoPfNWEPbhSvxvncgtGo6L8WY')
+end
+
+Given(/^a user "(.*?)" has opted\-in$/) do |arg1|
+  User.find_or_create_by!(nickname: arg1) do |user|
+    user.nickname = arg1
+    user.password = "password"
+    user.email = "#{arg1.parameterize}@example.com"
+    user.skip_confirmation!
+  end
 end
 
 Given(/^a deposit of "(.*?)"$/) do |arg1|
@@ -48,6 +61,14 @@ def add_new_commit(id, params = {})
       },
     },
   }
+
+  User.find_or_create_by(email: "anonymous@example.com") do |user|
+    user.nickname = "anonymous"
+    user.email = "anonymous@example.com"
+    user.password = "password"
+    user.skip_confirmation!
+  end
+
   @new_commits[id] = defaults.deep_merge(params)
 end
 

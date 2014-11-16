@@ -6,7 +6,9 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
 
-CONFIG ||= YAML::load(File.open("config/config.yml"))
+# load config.yaml preprocessed
+CONFIG ||= YAML::load(ERB.new(File.read("config/config.yml")).result)
+
 
 module T4c
   class Application < Rails::Application
@@ -25,7 +27,7 @@ module T4c
 
   config.autoload_paths += %W(#{config.root}/lib)
   config.assets.initialize_on_precompile = true
-  config.available_locales = %w(en fr ru)
+  config.available_locales = %w(en fr ru pl)
   end
 end
 

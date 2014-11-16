@@ -41,9 +41,15 @@
               \/
               = link_to t('links.sign_out'), destroy_user_session_path, method: :delete
             - else
-              = link_to t('links.sign_in'), new_user_session_path
+              - if controller_name != 'registrations'
+                = link_to t('links.sign_up'), new_user_registration_path
+              - unless %w{sessions registrations}.include? controller_name
+                = " or "
+              - if controller_name != 'sessions'
+                = link_to t('links.sign_in'), new_user_session_path
 
         %h3.text-muted.code-pro= t('tip4commit')
+
         = render 'common/menu'
 
       %br
@@ -53,6 +59,16 @@
       = yield
 
       .footer
+        .alert.alert-warning
+          %p
+            We are not affiliated with most of the projects, their owners may be unaware of or actively against using tip4commit. Due to potential ethical and legal issues we may remove any project from the list by request of project maintainers.
+
+          %p
+            Also we are not notifying developers about their tips anymore. Thus we can't guarantee that donated funds will really reach them.
+
+          %p
+            By donating funds you agree that they can be sent to Free Software Foundation or elsewhere at Tip4Commit's discretion.
+      
         %p.pull-right
           - ::Rails.application.config.available_locales.each do |locale|
             = link_to image_tag("flags/#{locale}.png"), "?locale=#{locale}", data: {no_turbolink: true}

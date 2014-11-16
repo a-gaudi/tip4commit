@@ -1,4 +1,12 @@
 GIT
+  remote: git://github.com/ActsAsParanoid/acts_as_paranoid.git
+  revision: ddcd1915179c73f74985af6bc8935321ca2fe08d
+  specs:
+    acts_as_paranoid (0.5.0.beta1)
+      activerecord (~> 4.0)
+      activesupport (~> 4.0)
+
+GIT
   remote: git://github.com/alexandrz/omniauth-github.git
   revision: 37a030aa37659831ef80af21b5c7270fe1384b3c
   branch: provide_emails
@@ -6,6 +14,12 @@ GIT
     omniauth-github (1.1.0)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.1)
+
+GIT
+  remote: git://github.com/bootstrap-ruby/rails-bootstrap-forms.git
+  revision: bb5e1ca8b8fdb6405feb162338e45468dac83c30
+  specs:
+    bootstrap_form (2.2.0)
 
 GIT
   remote: git://github.com/capistrano/rvm.git
@@ -25,13 +39,6 @@ GIT
       execjs
       rails (>= 3.1)
       railties (>= 3.1)
-
-GIT
-  remote: git://github.com/sigmike/rails-bootstrap-forms.git
-  revision: a1c8420ab999df56b13d3de8a097528b77a02217
-  branch: removed_for_on_radio_label
-  specs:
-    bootstrap_form (2.0.1)
 
 GIT
   remote: git://github.com/stouset/twitter_bootstrap_form_for.git
@@ -317,6 +324,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  acts_as_paranoid!
   airbrake (~> 3.1.15)
   bootstrap_form!
   cancancan
